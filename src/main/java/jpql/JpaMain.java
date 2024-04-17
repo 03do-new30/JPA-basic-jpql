@@ -26,8 +26,20 @@ public class JpaMain {
             em.clear();
 
             // 스칼라타입
-            em.createQuery("select distinct m.username, m.age from Member m")
+            // Object[] 타입으로 조회
+            List<Object[]> resultList = em.createQuery("select distinct m.username, m.age from Member m")
                     .getResultList();
+            Object[] result = resultList.get(0);
+            System.out.println("result[0] username = " + result[0]);
+            System.out.println("result[1] age = " + result[1]);
+
+            // DTO 만들고, new 명령어로 조회
+            List<MemberDTO> resultList1 = em.createQuery(
+                    "select distinct new jpql.MemberDTO(m.username, m.age) from Member m",
+                            MemberDTO.class)
+                    .getResultList();
+            System.out.println("resultList1.get(0).getUsername() = " + resultList1.get(0).getUsername());
+            System.out.println("resultList1.get(0).getAge() = " + resultList1.get(0).getAge());
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
         } catch (Exception e) {
