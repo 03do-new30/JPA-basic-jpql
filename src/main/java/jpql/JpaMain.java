@@ -25,12 +25,8 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            // join 쿼리 나감
-            List<Team> result1 = em.createQuery("select m.team from Member m", Team.class)
-                    .getResultList();
-            // join 쿼리가 나간다면 jpql에도 명시해 주는 것이 좋음
-            // 예측 가능하게 짜야 한다!
-            List<Team> result2 = em.createQuery("select t from Member m join m.team t", Team.class)
+            // 임베디드 타입
+            List<Address> result = em.createQuery("select o.address from Order o", Address.class)
                     .getResultList();
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
