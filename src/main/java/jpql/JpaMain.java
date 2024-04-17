@@ -24,6 +24,7 @@ public class JpaMain {
             member.setUsername("teamA");
             member.setAge(10);
             member.setTeam(team);
+            member.setMemberType(MemberType.ADMIN);
 
             em.persist(member);
 
@@ -31,18 +32,15 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-//            String query = "select m from Member m inner join m.team t"; // inner join
-//            String query = "select m from Member m left outer join m.team t"; // left outer join
-//            String query = "select m from Member m, Team t where m.username = t.name"; // 세타 조인
-            // on절을 활용한 조인 쿼리
-            String query = "select m from Member m left join m.team t on t.name = 'teamA'";
-            List<Member> resultList = em.createQuery(query, Member.class).getResultList();
-            // on절을 활용한 조인 쿼리 - 연관관계 없는 엔티티 외부(left outer join) 조인
-            // 문법이 살짝 다름 Team t 따로 선언해야 함
-            String query2 = "select m from Member m left join Team t on m.username = t.name";
-            List<Member> resultList2 = em.createQuery(query2, Member.class).getResultList();
-            for (Member member1 : resultList2) {
-                System.out.println("member1 = " + member1);
+            String query = "select m.username, 'Hello', true from Member m " +
+                    "where m.memberType = :userType";
+            List<Object[]> resultList = em.createQuery(query)
+                    .setParameter("userType", MemberType.ADMIN)
+                    .getResultList();
+            for (Object[] objects : resultList) {
+                System.out.println("objects[0] = " + objects[0]);
+                System.out.println("objects[1] = " + objects[1]);
+                System.out.println("objects[2] = " + objects[2]);
             }
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
