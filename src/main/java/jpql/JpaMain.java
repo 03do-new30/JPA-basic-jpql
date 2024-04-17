@@ -21,22 +21,12 @@ public class JpaMain {
             member.setAge(10);
             em.persist(member);
 
-            // 결과가 하나 이상일 때
-            TypedQuery<Member> query = em.createQuery("select m from Member m", Member.class);
-            List<Member> resultList = query.getResultList();
-            for (Member member1 : resultList) {
-                System.out.println("member1 = " + member1);
-            }
 
-            // 결과가 정확히 하나
-            TypedQuery<Member> query2 = em.createQuery("select m from Member m where m.id = 100L", Member.class);
-            try{
-                Member singleResult = query2.getSingleResult();
-            } catch(NoResultException e) {
-                System.out.println("no result exception");
-            }
-            // 주의! 결과가 없으면 NoResultException
-            // 결과가 둘 이상이면 NonUniqueResultException
+            // 파라미터 바인딩 - 이름 기준
+            Member result = em.createQuery("select m from Member m where m.username = :username", Member.class)
+                    .setParameter("username", "member1")
+                    .getSingleResult();
+            System.out.println("singleResult = " + result.getUsername());
 
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
