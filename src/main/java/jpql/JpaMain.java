@@ -2,6 +2,8 @@ package jpql;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 public class JpaMain {
 
     public static void main(String[] args) {
@@ -19,11 +21,23 @@ public class JpaMain {
             member.setAge(10);
             em.persist(member);
 
-            // 타입 정보를 알 수 있을 때
-            TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class);
-            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
-            // 타입 정보를 받을 수 있을 때
-            Query query3 = em.createQuery("select m.username, m.age from Member m");
+            // 결과가 하나 이상일 때
+            TypedQuery<Member> query = em.createQuery("select m from Member m", Member.class);
+            List<Member> resultList = query.getResultList();
+            for (Member member1 : resultList) {
+                System.out.println("member1 = " + member1);
+            }
+
+            // 결과가 정확히 하나
+            TypedQuery<Member> query2 = em.createQuery("select m from Member m where m.id = 100L", Member.class);
+            try{
+                Member singleResult = query2.getSingleResult();
+            } catch(NoResultException e) {
+                System.out.println("no result exception");
+            }
+            // 주의! 결과가 없으면 NoResultException
+            // 결과가 둘 이상이면 NonUniqueResultException
+
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
         } catch (Exception e) {
