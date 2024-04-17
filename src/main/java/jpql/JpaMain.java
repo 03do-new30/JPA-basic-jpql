@@ -37,28 +37,20 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            // 기본 CASE식
-            String query = "select " +
-                    "case when m.age <= 10 then '학생요금' " +
-                    "when m.age >= 60 then '경로요금' " +
-                    "else 'common' " +
-                    "end " +
-                    "from Member m";
+            // concat
+            String query = "select concat('a', 'b') from Member m";
             List<String> resultList = em.createQuery(query).getResultList();
-            for (String s : resultList) {
-                System.out.println("s = " + s);
+            // locate
+            String query2 = "select locate('de', 'abcdefg')from Member m"; // 4를 반환함
+            List<Integer> resultList2 = em.createQuery(query2).getResultList();
+            for (Integer i : resultList2) {
+                System.out.println("locate = " + i);
             }
-            // COALESCE - 사용자 이름이 없으면 이름 없는 회원을 반환한다
-            String query2 = "select coalesce(m.username, '이름 없는 회원') from Member m";
-            List<String> resultList2 = em.createQuery(query2).getResultList();
-            for (String s : resultList2) {
-                System.out.println("coalesce 결과 = " + s);
-            }
-            // NULLIF - 두 값이 같으면 null을 반환하고 아니면 본인의 데이터를 반환
-            String query3 = "select NULLIF(m.username, '관리자') from Member m";
-            List<String> resultList3 = em.createQuery(query3).getResultList();
-            for (String s : resultList3) {
-                System.out.println("nullif 결과 = " + s);
+            // size
+            String query3 = "select size(t.members) from Team t"; // 크기를 반환
+            List<Integer> resultList3 = em.createQuery(query3).getResultList();
+            for (Integer i : resultList3) {
+                System.out.println("size = " + i);
             }
 
 
