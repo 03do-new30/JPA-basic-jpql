@@ -1,9 +1,6 @@
 package jpql;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 
 public class JpaMain {
 
@@ -19,7 +16,14 @@ public class JpaMain {
         try {
             Member member = new Member();
             member.setUsername("member1");
+            member.setAge(10);
             em.persist(member);
+
+            // 타입 정보를 알 수 있을 때
+            TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class);
+            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
+            // 타입 정보를 받을 수 있을 때
+            Query query3 = em.createQuery("select m.username, m.age from Member m");
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
         } catch (Exception e) {
