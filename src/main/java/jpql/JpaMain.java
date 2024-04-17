@@ -25,8 +25,8 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            // 임베디드 타입
-            List<Address> result = em.createQuery("select o.address from Order o", Address.class)
+            // 스칼라타입
+            em.createQuery("select distinct m.username, m.age from Member m")
                     .getResultList();
 
             tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
