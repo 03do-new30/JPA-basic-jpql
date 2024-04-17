@@ -3,6 +3,7 @@ package jpql;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "ORDERS")
 public class Order {
     @Id @GeneratedValue
     private Long id;
