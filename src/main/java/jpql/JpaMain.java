@@ -17,48 +17,55 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("팀A");
+            em.persist(teamA);
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            member.setTeam(team);
-            member.setMemberType(MemberType.ADMIN);
+            Team teamB = new Team();
+            teamB.setName("팀B");
+            em.persist(teamB);
+
+            Team teamC = new Team();
+            teamC.setName("팀C");
+            em.persist(teamC);
+
+            Member member1 = new Member();
+            member1.setUsername("회원1");
+            member1.setTeam(teamA);
+            em.persist(member1);
 
             Member member2 = new Member();
-            member2.setUsername("관리자");
-            member2.setAge(20);
-
-            em.persist(member);
+            member2.setUsername("회원2");
+            member2.setTeam(teamA);
             em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setTeam(teamB);
+            em.persist(member3);
+
+            Member member4 = new Member();
+            member4.setUsername("회원4");
+            em.persist(member4);
 
             // 영속성 컨텍스트 비운다
             em.flush();
             em.clear();
 
-            // 상태 필드
-            String query1 = "select m.username from Member m";
-            // 단일값 연관 필드
-            // team.name도 갈 수 있다
-            // 묵시적인 내부 조인이 발생한다
-            String query2 = "select m.team from Member m";
-            // 컬렉션값 연관 필드
-            // 묵시적인 내부 조인이 발생한다
-            // t.members.username 으로 탐색할 수 없다. 컬렉션으로 받아오기 때문에
-            String query3 = "select t.members from Team t";
-            List<Collection> result = em.createQuery(query3, Collection.class).getResultList();
-            tx.commit(); // 커밋 시점에 INSERT (버퍼링 가능)
-            for (Object o : result) {
-                System.out.println("o = " + o);
+            // no join fetch
+            // proxy를 사용하기 때문에 getTeam().getName() 할 때 팀 쿼리를 날림
+//            String query = "select m from Member m";
+            // yes join fetch
+            String query = "select m from Member m join fetch m.team";
+            List<Member> resultList = em.createQuery(query, Member.class).getResultList();
+            for (Member member : resultList) {
+                // 페치 조인으로 회원과 팀을 함께 조회했으므로 지연 로딩 X
+                System.out.println("member.getUsername() = " + member.getUsername());
+                System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+                System.out.println("----------------------------------------------");
             }
-            // t.members.username 가져오고싶으면 명시적 join 사용해야 한다
-            String query4 = "select m.username from Team t join t.members m";
-            List<String> resultList = em.createQuery(query4, String.class).getResultList();
-            for (String s : resultList) {
-                System.out.println("s = " + s);
-            }
+
+            tx.commit();
         } catch (Exception e) {
             tx.rollback();
             e.printStackTrace();
