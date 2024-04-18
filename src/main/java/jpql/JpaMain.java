@@ -52,17 +52,15 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            // no join fetch
-            // proxy를 사용하기 때문에 getTeam().getName() 할 때 팀 쿼리를 날림
-//            String query = "select m from Member m";
-            // yes join fetch
-            String query = "select m from Member m join fetch m.team";
-            List<Member> resultList = em.createQuery(query, Member.class).getResultList();
-            for (Member member : resultList) {
-                // 페치 조인으로 회원과 팀을 함께 조회했으므로 지연 로딩 X
-                System.out.println("member.getUsername() = " + member.getUsername());
-                System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
-                System.out.println("----------------------------------------------");
+            String query = "select t from Team t join fetch t.members";
+            List<Team> resultList = em.createQuery(query, Team.class).getResultList();
+            // Hibernate6 변경 사항
+            // distinct 명령어를 사용하지 않아도 애플리케이션에서 중복 제거가 자동으로 적용됨
+            for (Team team : resultList) {
+                System.out.println("team = " + team.getName() + " | members = " + team.getMembers().size());
+                for (Member member : team.getMembers()) {
+                    System.out.println("    member = " + member);
+                }
             }
 
             tx.commit();
