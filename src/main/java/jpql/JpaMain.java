@@ -67,6 +67,24 @@ public class JpaMain {
             System.out.println("findMember = " + findMember2);
             // 둘 다 똑같은 쿼리
 
+            // 엔티티 직접 사용 - 외래 키 값
+            // TEAM_ID = 팀아이디
+            // (1) 엔티티 전달
+            String query3 = "select m from Member m where m.team = :team";
+            List<Member> resultList = em.createQuery(query3, Member.class)
+                    .setParameter("team", teamA)
+                    .getResultList();
+            for (Member member : resultList) {
+                System.out.println("member = " + member);
+            }
+            // (2) 식별자 전달
+            String query4 = "select m from Member m where m.team.id = :teamId";
+            List<Member> resultList1 = em.createQuery(query4, Member.class)
+                    .setParameter("teamId", teamA.getId())
+                    .getResultList();
+            for (Member member : resultList1) {
+                System.out.println("member = " + member);
+            }
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
