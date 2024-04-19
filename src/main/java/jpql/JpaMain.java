@@ -52,21 +52,20 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-//            String query = "select t from Team t join fetch t.members";
-            // 일반 쿼리
-            // SQL문에 join은 들어가지만, 실제 데이터를 퍼올리는 건 Team에 대해서만 퍼올림
-            String query = "select t from Team t join t.members";
-            List<Team> resultList = em.createQuery(query, Team.class).getResultList();
-            System.out.println("resultList.size() = " + resultList.size());
-            // Hibernate6 변경 사항
-            // distinct 명령어를 사용하지 않아도 애플리케이션에서 중복 제거가 자동으로 적용됨
-            for (Team team : resultList) {
-                // 일반 쿼리를 사용하면 team.getMembers()를 위해 쿼리가 추가로 실행됨
-                System.out.println("team = " + team.getName() + " | members = " + team.getMembers().size());
-                for (Member member : team.getMembers()) {
-                    System.out.println("    member = " + member);
-                }
-            }
+            // 엔티티 직접 사용 - 기본 키 값으로 사용된다
+            // (1) 엔티티를 파라미터로 전달
+            String query = "select m from Member m where m = :member";
+            Member findMember = em.createQuery(query, Member.class)
+                    .setParameter("member", member1)
+                    .getSingleResult();
+            System.out.println("findMember = " + findMember);
+            // (2) 식별자로 직접 전달
+            String query2 = "select m from Member m where m.id = :member";
+            Member findMember2 = em.createQuery(query2, Member.class)
+                    .setParameter("member", member1.getId())
+                    .getSingleResult();
+            System.out.println("findMember = " + findMember2);
+            // 둘 다 똑같은 쿼리
 
             tx.commit();
         } catch (Exception e) {
