@@ -48,16 +48,24 @@ public class JpaMain {
             member4.setUsername("회원4");
             em.persist(member4);
 
-            // 영속성 컨텍스트 비운다
-            em.flush();
-            em.clear();
 
-            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
-                    .setParameter("username", "회원1").
-                    getResultList();
-            for (Member member : resultList) {
-                System.out.println(member);
-            }
+            // 벌크 연산
+            // 모든 회원의 나이를 20살로 바꿔보자
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate(); // 쿼리 날리면 자동으로 flush! (flush된다고 영속성 컨텍스트가 지워지는 건 아님, 그저 DB 반영)
+            System.out.println("resultCount = " + resultCount);
+            // 벌크 연산은 영속성 컨텍스트를 무시
+            // 해결방법1. 벌크연산을 먼저 실행
+            // 해결방법2. 벌크 연산 수행 후 영속성 컨텍스트 초기화한다
+
+
+            // 아래 멤버들은 전부 age 0으로 나온다
+            // 벌크 연산은 DB에 강제로 업데이트 하는 것이기 때문에 영속성 컨텍스트를 무시한다
+            // 따라서, 현재 영속성 컨텍스트에 있는 member1, 2, 3, 4의 age는 20으로 업데이트 전의 age이다.
+            System.out.println("member1 = " + member1);
+            System.out.println("member2 = " + member2);
+            System.out.println("member3 = " + member3);
+            System.out.println("member4 = " + member4);
 
             tx.commit();
         } catch (Exception e) {
